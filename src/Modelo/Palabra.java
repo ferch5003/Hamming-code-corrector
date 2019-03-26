@@ -65,6 +65,8 @@ public class Palabra {
         return this.fr;
     }
 
+    // Continuación del constructor, se encarga de obtener los valores de laslongitudes y setear los vectores necesarios
+    // para el envio y recepción de los codigos
     public void setSizes(int longitud) {
         this.cantidadDePalabras = longitud;
         this.longitudDatos = 8;
@@ -123,6 +125,8 @@ public class Palabra {
         return this.m;
     }
 
+    // Retorna falso si la linea que se leyo tiene mas de dos letras y ademas que no pertenezca las letras minusculas,
+    // mayusculas o los caracteres .|| ||,||:||;||, sino retorna verdadero
     public boolean verificacionLectura(String linea) throws IOException {
 
         if (linea.length() > 2) {
@@ -147,6 +151,7 @@ public class Palabra {
         return this.br.readLine();
     }
 
+    // Retorna la cantidad de palabras de codigo que hay en el archivo
     public int lineasLeidas() throws IOException {
         int count = 0;
         String linea;
@@ -160,6 +165,7 @@ public class Palabra {
         return count;
     }
 
+    // Le da valos al vector de palabras de codigo cuando se va a recibir el .ham
     public void setPalabrasDeCodigo() throws IOException {
         int count = 0;
         String linea;
@@ -175,6 +181,7 @@ public class Palabra {
         this.br.close();
     }
 
+    // Genera el archivo .ham con las palabras de codigo
     public void crearCodificacionHamming(String[] codigos) throws IOException {
         String OS = System.getProperty("os.name").toLowerCase();
 
@@ -198,6 +205,7 @@ public class Palabra {
         bw.close();
     }
 
+    // Genera el .txt con las letras originales
     public void crearDecodificacionHamming(String[] codigos) throws IOException {
         String OS = System.getProperty("os.name").toLowerCase();
 
@@ -236,7 +244,8 @@ public class Palabra {
         }
         return binario;
     }
-
+    
+    // Esta funcion sirve es para armar el vector que se encarga de ver en que bit se encuentra el error
     public int[] Binario(int decimal) {
         int longitud = longitudBinario(decimal);
         int count = 0;
@@ -254,6 +263,7 @@ public class Palabra {
         return binario;
     }
 
+    // Retorna el bit de paridad de la potencia de dos en que se encuentre la palabra de codigo
     public int bitDeParidad(int exponente, int modulo, int fila) {
         int b = 0;
         int count = 0;
@@ -278,6 +288,7 @@ public class Palabra {
         return b;
     }
 
+    // Retorna cual bit es el que esta errado. Si es 0 es que ninguno esta errado
     public int verificacionDeParidad(int fila) {
         int exponente = this.m - 1;
         int bitErrado = 0;
@@ -304,6 +315,7 @@ public class Palabra {
         return m;
     }
 
+    // Retorna la palabra el texto que se queria reemplazar
     private String reemplazar(String cadena, String buscarTexto, String reemplazarTexto) {
         String[] cadenas = cadena.split(buscarTexto);
         return cadenas[0] + reemplazarTexto;
