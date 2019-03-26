@@ -104,7 +104,6 @@ public class ControladorPalabra {
 
         try {
             int lineasLeidas = decodificacioHamming.lineasLeidas();
-
             // Verifica si el archivo tiene menos de dos lineas
             if (lineasLeidas < 3 && lineasLeidas > 0) {
                 decodificacioHamming.setSizes(lineasLeidas);
@@ -183,6 +182,7 @@ public class ControladorPalabra {
                     ascii[count] = String.valueOf((char) codigoAscii);
                     count++;
                 }
+                
                 // Guarda los caracteres en el .txt
                 decodificacioHamming.crearDecodificacionHamming(ascii);
                 return true;

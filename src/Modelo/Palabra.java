@@ -183,16 +183,10 @@ public class Palabra {
 
     // Genera el archivo .ham con las palabras de codigo
     public void crearCodificacionHamming(String[] codigos) throws IOException {
-        String OS = System.getProperty("os.name").toLowerCase();
 
         // Generando el archivo .ham con ruta relativa
         String[] stringDeRuta;
-        // Dependiendo del OS forma el vector para generar el .ham
-        if (esWindows(OS)) {
-            stringDeRuta = this.ruta.split("\\");
-        } else {
-            stringDeRuta = this.ruta.split("/");
-        }
+        stringDeRuta = this.ruta.split("/");
         String nombreDelArchivo = stringDeRuta[stringDeRuta.length - 1];
         String archivoConvertido = reemplazar(nombreDelArchivo, "txt", "ham");
         File archivoCodificado = new File("src/Modelo/" + archivoConvertido);
@@ -207,16 +201,10 @@ public class Palabra {
 
     // Genera el .txt con las letras originales
     public void crearDecodificacionHamming(String[] codigos) throws IOException {
-        String OS = System.getProperty("os.name").toLowerCase();
 
         // Generando el archivo .ham con ruta relativa
         String[] stringDeRuta;
-        // Dependiendo del OS forma el vector para generar el .ham
-        if (esWindows(OS)) {
-            stringDeRuta = this.ruta.split("\\");
-        } else {
-            stringDeRuta = this.ruta.split("/");
-        }
+        stringDeRuta = this.ruta.split("/");
         String nombreDelArchivo = stringDeRuta[stringDeRuta.length - 1];
         String archivoConvertido = reemplazar(nombreDelArchivo, "ham", "txt");
         File archivoCodificado = new File("src/Modelo/" + archivoConvertido);
@@ -320,11 +308,4 @@ public class Palabra {
         String[] cadenas = cadena.split(buscarTexto);
         return cadenas[0] + reemplazarTexto;
     }
-
-    private boolean esWindows(String OS) {
-
-        return (OS.indexOf("win") >= 0);
-
-    }
-
 }

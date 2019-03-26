@@ -4,9 +4,11 @@
  * and open the template in the editor.
  */
 package correccion;
+
 import Controlador.ControladorPalabra;
 import java.io.IOException;
 import java.util.Scanner;
+
 /**
  *
  * @author ferch5003
@@ -18,12 +20,20 @@ public class Correccion {
      */
     public static void main(String[] args) throws IOException {
         String ruta = "src/Modelo/cod.txt";
+        String ruta2 = "src/Modelo/cod.ham";
         ControladorPalabra controlador = new ControladorPalabra();
+        /*
         if(controlador.envio(ruta)){
             
         }else{
             System.out.println("No se pudo enviar");
         }
+         */
+        if (controlador.recepcion(ruta2)) {
+
+        } else {
+            System.out.println("No se pudo enviar");
+        }
     }
-    
+
 }
