@@ -27,6 +27,7 @@ public class Palabra {
     private int cantidadDePalabras;
     private int[][] palabrasDeDatos;
     private int[][] palabrasDeCodigo;
+    private int[][] binarioDeCorreccion;
     private int m;
     private int longitudDatos;
     private int longitudCodigos;
@@ -64,17 +65,22 @@ public class Palabra {
         return this.fr;
     }
 
-    public void setSizes(int longitud, char palabra) {
+    public void setSizes(int longitud) {
         this.cantidadDePalabras = longitud;
         this.longitudDatos = 8;
         this.m = longitudCodigo(this.longitudDatos);
         this.longitudCodigos = this.longitudDatos + this.m;
         this.palabrasDeDatos = new int[this.cantidadDePalabras][8];
         this.palabrasDeCodigo = new int[this.cantidadDePalabras][12];
+        this.binarioDeCorreccion = new int[this.cantidadDePalabras][this.m];
     }
 
     public void setPalabraDeDatos(int fila, char palabra) {
         this.palabrasDeDatos[fila] = decimalABinario(palabra);
+    }
+
+    public void setPalabraDeDatos(int fila, int columna, int valor) {
+        this.palabrasDeDatos[fila][columna] = valor;
     }
 
     public int getPalabraDeDatos(int fila, int columna) {
@@ -97,6 +103,14 @@ public class Palabra {
         return this.palabrasDeCodigo;
     }
 
+    public int[][] getBinarioDeCorrecion() {
+        return this.binarioDeCorreccion;
+    }
+
+    public void setBinarioDeCorrecion(int fila, int columna, int valor) {
+        this.binarioDeCorreccion[fila][columna] = valor;
+    }
+
     public int getLongitudDeDato() {
         return this.longitudDatos;
     }
@@ -110,18 +124,16 @@ public class Palabra {
     }
 
     public boolean verificacionLectura(String linea) throws IOException {
-        
+
         if (linea.length() > 2) {
             return false;
         }
-        
+
         for (char letra : linea.toCharArray()) {
             int ascii = (int) letra;
-            System.out.println(ascii);
             if (((ascii < 65 && ascii > 90) || (ascii < 97 && ascii > 122)) && esAdmitido(String.valueOf(letra))) {
-                System.out.println("entro");
                 return false;
-            }  
+            }
         }
 
         return true;
@@ -133,6 +145,34 @@ public class Palabra {
 
     public String lineaLeida() throws IOException {
         return this.br.readLine();
+    }
+
+    public int lineasLeidas() throws IOException {
+        int count = 0;
+        String linea;
+        while ((linea = this.br.readLine()) != null) {
+            count++;
+        }
+        this.br.close();
+        this.archivo = new File(this.ruta);
+        this.fr = new FileReader(this.archivo);
+        this.br = new BufferedReader(this.fr);
+        return count;
+    }
+
+    public void setPalabrasDeCodigo() throws IOException {
+        int count = 0;
+        String linea;
+        while ((linea = this.br.readLine()) != null) {
+            int binario = 0;
+            for (char numero : linea.toCharArray()) {
+                String valor = String.valueOf(numero);
+                this.palabrasDeCodigo[count][binario] = Integer.parseInt(valor);
+                binario++;
+            }
+            count++;
+        }
+        this.br.close();
     }
 
     public void crearCodificacionHamming(String[] codigos) throws IOException {
@@ -158,28 +198,29 @@ public class Palabra {
         bw.close();
     }
 
-    public void crearDecodificacionHamming(String[] codigos) {
+    public void crearDecodificacionHamming(String[] codigos) throws IOException {
         String OS = System.getProperty("os.name").toLowerCase();
-        try {
-            // Generando el archivo .ham con ruta relativa
-            String[] stringDeRuta;
-            // Dependiendo del OS forma el vector para generar el .ham
-            if (esWindows(OS)) {
-                stringDeRuta = this.ruta.split("\\");
-            } else {
-                stringDeRuta = this.ruta.split("/");
-            }
-            String nombreDelArchivo = stringDeRuta[stringDeRuta.length - 1];
-            String archivoConvertido = reemplazar(nombreDelArchivo, "txt", "ham");
-            File archivoCodificado = new File(archivoConvertido);
-            FileWriter fw = new FileWriter(archivoCodificado);
-            // Escribiendo en el .ham correspondiente
-            BufferedWriter bw = new BufferedWriter(fw);
-            for (String codigo : codigos) {
-                bw.write(codigo);
-            }
-        } catch (Exception e) {
+
+        // Generando el archivo .ham con ruta relativa
+        String[] stringDeRuta;
+        // Dependiendo del OS forma el vector para generar el .ham
+        if (esWindows(OS)) {
+            stringDeRuta = this.ruta.split("\\");
+        } else {
+            stringDeRuta = this.ruta.split("/");
         }
+        String nombreDelArchivo = stringDeRuta[stringDeRuta.length - 1];
+        String archivoConvertido = reemplazar(nombreDelArchivo, "ham", "txt");
+        File archivoCodificado = new File("src/Modelo/" + archivoConvertido);
+        FileWriter fw = new FileWriter(archivoCodificado);
+        // Escribiendo en el .ham correspondiente
+        BufferedWriter bw = new BufferedWriter(fw);
+        String letras = "";
+        for (String codigo : codigos) {
+            letras = letras + codigo;
+        }
+        bw.write(letras);
+        bw.close();
     }
 
     public int[] decimalABinario(int decimal) {
@@ -235,6 +276,16 @@ public class Palabra {
             }
         }
         return b;
+    }
+
+    public int verificacionDeParidad(int fila) {
+        int exponente = this.m - 1;
+        int bitErrado = 0;
+        for (int bi : this.binarioDeCorreccion[fila]) {
+            bitErrado = bitErrado + (bi * (int) Math.pow(2, exponente));
+            exponente--;
+        }
+        return bitErrado;
     }
 
     private int log2(int x) {

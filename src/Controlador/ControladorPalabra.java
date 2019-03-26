@@ -16,39 +16,38 @@ import java.io.IOException;
 public class ControladorPalabra {
 
     public boolean envio(String ruta) {
-        Palabra archivoDeCorreccion = new Palabra(ruta);
+        Palabra codificacionHamming = new Palabra(ruta);
 
         try {
-            String linea = archivoDeCorreccion.lineaLeida();
-            if (archivoDeCorreccion.verificacionLectura(linea)) {
+            String linea = codificacionHamming.lineaLeida();
 
-                archivoDeCorreccion.setSizes(linea.length(), linea.toCharArray()[0]);
-                
+            if (codificacionHamming.verificacionLectura(linea)) {
+
+                codificacionHamming.setSizes(linea.length());
+
                 int count = 0;
                 for (char palabra : linea.toCharArray()) {
-                    archivoDeCorreccion.setPalabraDeDatos(count, palabra);
+                    codificacionHamming.setPalabraDeDatos(count, palabra);
                     count++;
                 }
                 count = 0;
-                for (int palabra[] : archivoDeCorreccion.getPalabraDeDatos()) {
-                    for(int bi : palabra){
-                        System.out.print(bi);
+                for (int palabra[] : codificacionHamming.getPalabraDeDatos()) {
+                    for (int bi : palabra) {
                     }
-                    System.out.println("");
                     count++;
                 }
-                
+
                 count = 0;
-                for (int[] palabra : archivoDeCorreccion.getPalabraDeDatos()) {
-                    
-                    int exponente = archivoDeCorreccion.getM() - 1;
+                for (int[] palabra : codificacionHamming.getPalabraDeDatos()) {
+
+                    int exponente = codificacionHamming.getM() - 1;
                     int modulo;
                     int j = 0;
-                    for (int i = archivoDeCorreccion.getLongitudDeCodigo() - 1; i > -1; i--) {
+                    for (int i = codificacionHamming.getLongitudDeCodigo() - 1; i > -1; i--) {
                         modulo = (int) Math.pow(2, exponente);
                         if ((i + 1) % modulo != 0) {
-                            archivoDeCorreccion.setPalabraDeCodigos(count, archivoDeCorreccion.getLongitudDeCodigo() - i - 1, palabra[j]);
-                            
+                            codificacionHamming.setPalabraDeCodigos(count, codificacionHamming.getLongitudDeCodigo() - i - 1, palabra[j]);
+
                             j++;
                         } else {
                             exponente--;
@@ -59,16 +58,16 @@ public class ControladorPalabra {
                 }
 
                 count = 0;
-                for (int[] palabra : archivoDeCorreccion.getPalabraDeCodigos()) {
-                    int exponente = archivoDeCorreccion.getM() - 1;
+                for (int[] palabra : codificacionHamming.getPalabraDeCodigos()) {
+                    int exponente = codificacionHamming.getM() - 1;
                     int modulo;
-                    for (int i = archivoDeCorreccion.getLongitudDeCodigo() - 1; i > -1; i--) {
+                    for (int i = codificacionHamming.getLongitudDeCodigo() - 1; i > -1; i--) {
                         modulo = (int) Math.pow(2, exponente);
 
                         if ((i + 1) % modulo == 0) {
-                            int b = archivoDeCorreccion.bitDeParidad(exponente, modulo, count);
+                            int b = codificacionHamming.bitDeParidad(exponente, modulo, count);
 
-                            archivoDeCorreccion.setPalabraDeCodigos(count, archivoDeCorreccion.getLongitudDeCodigo() - i - 1, b);
+                            codificacionHamming.setPalabraDeCodigos(count, codificacionHamming.getLongitudDeCodigo() - i - 1, b);
 
                             exponente--;
                         }
@@ -78,7 +77,7 @@ public class ControladorPalabra {
                 }
                 String[] palabrasDeCodigo = new String[2];
                 count = 0;
-                for (int[] palabra : archivoDeCorreccion.getPalabraDeCodigos()) {
+                for (int[] palabra : codificacionHamming.getPalabraDeCodigos()) {
                     palabrasDeCodigo[count] = "";
                     for (int bit : palabra) {
                         palabrasDeCodigo[count] = palabrasDeCodigo[count] + String.valueOf(bit);
@@ -86,9 +85,96 @@ public class ControladorPalabra {
                     count++;
                 }
 
-                archivoDeCorreccion.crearCodificacionHamming(palabrasDeCodigo);
+                codificacionHamming.crearCodificacionHamming(palabrasDeCodigo);
                 return true;
             }
+        } catch (Exception e) {
+        }
+
+        return false;
+    }
+
+    public boolean recepcion(String ruta){
+        Palabra decodificacioHamming = new Palabra(ruta);
+
+        try {
+            int lineasLeidas = decodificacioHamming.lineasLeidas();
+            
+            if (lineasLeidas < 3 && lineasLeidas > -1) {
+                decodificacioHamming.setSizes(lineasLeidas);
+
+                decodificacioHamming.setPalabrasDeCodigo();
+
+                int count = 0;
+                for (int[] palabra : decodificacioHamming.getPalabraDeCodigos()) {
+                    int exponente = decodificacioHamming.getM() - 1;
+                    int modulo;
+                    for (int i = decodificacioHamming.getLongitudDeCodigo() - 1; i > -1; i--) {
+                        modulo = (int) Math.pow(2, exponente);
+
+                        if ((i + 1) % modulo == 0) {
+                            int posicionDeParidad = decodificacioHamming.getLongitudDeCodigo() - i - 1;
+                            int b = decodificacioHamming.bitDeParidad(exponente, modulo, count);
+                            if (b == decodificacioHamming.getPalabraDeCodigos(count, posicionDeParidad)) {
+                                b = 0;
+                            } else {
+                                b = 1;
+                            }
+                            decodificacioHamming.setBinarioDeCorrecion(count, decodificacioHamming.getM() - exponente - 1, b);
+
+                            exponente--;
+                        }
+
+                    }
+
+                    int bitErrado = decodificacioHamming.verificacionDeParidad(count);
+
+                    if (bitErrado != 0) {
+                        if (decodificacioHamming.getPalabraDeCodigos(count, decodificacioHamming.getLongitudDeCodigo() - bitErrado) == 0) {
+                            decodificacioHamming.setPalabraDeCodigos(count, decodificacioHamming.getLongitudDeCodigo() - bitErrado, 1);
+                        } else {
+                            decodificacioHamming.setPalabraDeCodigos(count, decodificacioHamming.getLongitudDeCodigo() - bitErrado, 0);
+                        }
+                    }
+                    count++;
+                }
+                count = 0;
+                for (int[] palabra : decodificacioHamming.getPalabraDeCodigos()) {
+                    int exponente = decodificacioHamming.getM() - 1;
+                    int modulo;
+                    int count2 = 0;
+                    for (int i = decodificacioHamming.getLongitudDeCodigo() - 1; i > -1; i--) {
+                        modulo = (int) Math.pow(2, exponente);
+
+                        if ((i + 1) % modulo != 0) {
+                            int bitDeDatos = decodificacioHamming.getLongitudDeCodigo() - i - 1;
+                            decodificacioHamming.setPalabraDeDatos(count, count2, decodificacioHamming.getPalabraDeCodigos(count, bitDeDatos));
+                            count2++;
+                        } else {
+                            exponente--;
+                        }
+
+                    }
+                    count++;
+                }
+                count = 0;
+                String[] ascii = new String[2];
+                for (int palabra[] : decodificacioHamming.getPalabraDeDatos()) {
+                    int exponente = palabra.length - 1;
+                    int codigoAscii = 0;
+                    for (int bi : palabra) {
+                        codigoAscii = codigoAscii + (bi * (int) (Math.pow(2, exponente)));
+                        exponente--;
+                    }
+                    ascii[count] = String.valueOf((char) codigoAscii);
+                    count++;
+                }
+                decodificacioHamming.crearDecodificacionHamming(ascii);
+                return true;
+            }else{
+                return false;
+            }
+
         } catch (Exception e) {
         }
 
