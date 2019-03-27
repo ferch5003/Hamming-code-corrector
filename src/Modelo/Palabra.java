@@ -69,15 +69,26 @@ public class Palabra {
     // para el envio y recepción de los codigos
     public void setSizes(int longitud) {
         this.cantidadDePalabras = longitud;
-        this.longitudDatos = 8;
+        int esImpar= longitud % 2;
+        this.longitudDatos = 16;
         this.m = longitudCodigo(this.longitudDatos);
         this.longitudCodigos = this.longitudDatos + this.m;
-        this.palabrasDeDatos = new int[this.cantidadDePalabras][8];
-        this.palabrasDeCodigo = new int[this.cantidadDePalabras][12];
+        this.palabrasDeDatos = new int[this.cantidadDePalabras / 2 + esImpar][16];
+        this.palabrasDeCodigo = new int[this.cantidadDePalabras / 2 + esImpar][21];
+        this.binarioDeCorreccion = new int[this.cantidadDePalabras / 2 + esImpar][this.m];
+    }
+    
+    public void setSizesDecod(int longitud) {
+        this.cantidadDePalabras = longitud;
+        this.longitudDatos = 16;
+        this.m = longitudCodigo(this.longitudDatos);
+        this.longitudCodigos = this.longitudDatos + this.m;
+        this.palabrasDeDatos = new int[this.cantidadDePalabras][16];
+        this.palabrasDeCodigo = new int[this.cantidadDePalabras][21];
         this.binarioDeCorreccion = new int[this.cantidadDePalabras][this.m];
     }
 
-    public void setPalabraDeDatos(int fila, char palabra) {
+    public void setPalabraDeDatos(int fila, String palabra) {
         this.palabrasDeDatos[fila] = decimalABinario(palabra);
     }
 
@@ -129,10 +140,6 @@ public class Palabra {
     // mayusculas o los caracteres .|| ||,||:||;||, sino retorna verdadero
     public boolean verificacionLectura(String linea) throws IOException {
 
-        if (linea.length() > 2) {
-            return false;
-        }
-
         for (char letra : linea.toCharArray()) {
             int ascii = (int) letra;
             if (((ascii < 65 && ascii > 90) || (ascii < 97 && ascii > 122)) && esAdmitido(String.valueOf(letra))) {
@@ -171,8 +178,10 @@ public class Palabra {
         String linea;
         while ((linea = this.br.readLine()) != null) {
             int binario = 0;
+            String val = "";
             for (char numero : linea.toCharArray()) {
                 String valor = String.valueOf(numero);
+                val = val + valor;
                 this.palabrasDeCodigo[count][binario] = Integer.parseInt(valor);
                 binario++;
             }
@@ -219,20 +228,32 @@ public class Palabra {
         bw.close();
     }
 
-    public int[] decimalABinario(int decimal) {
+    public int[] decimalABinario(String palabra) {
+        int decimal[] = new int[palabra.length()];
+        int count = 0;
+        for (char letra : palabra.toCharArray()) {
+            decimal[count] = (int) letra;
+            count++;
+        }
         int longitud = this.longitudDatos;
         int[] binario = new int[longitud];
         for (int i = 0; i < this.getM() - 1; i++) {
             binario[i] = 0;
         }
-        while (decimal / 2 != 0 || longitud > 0) {
-            binario[longitud - 1] = decimal % 2;
-            decimal = decimal / 2;
-            longitud--;
+        count = 0;
+        for (int bi : decimal) {
+            int longitud2 = this.longitudDatos / 2;
+            while (bi / 2 != 0 || longitud2 > 0) {
+                binario[longitud - 1] = bi % 2;
+                bi = bi / 2;
+                longitud--;
+                longitud2--;
+            }
+            count++;
         }
         return binario;
     }
-    
+
     // Esta funcion sirve es para armar el vector que se encarga de ver en que bit se encuentra el error
     public int[] Binario(int decimal) {
         int longitud = longitudBinario(decimal);

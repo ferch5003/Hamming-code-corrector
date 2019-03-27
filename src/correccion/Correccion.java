@@ -22,13 +22,14 @@ public class Correccion {
         String ruta = "src/Modelo/cod.txt";
         String ruta2 = "src/Modelo/cod.ham";
         ControladorPalabra controlador = new ControladorPalabra();
+
         /*
-        if(controlador.envio(ruta)){
-            
-        }else{
+        if (controlador.envio(ruta)) {
+
+        } else {
             System.out.println("No se pudo enviar");
         }
-         */
+        */
         if (controlador.recepcion(ruta2)) {
 
         } else {
