@@ -173,6 +173,7 @@ public class ControladorPalabra {
                 count++;
             }
 
+            
             count = 0;
             // Se forma la palabra de datos con el bit corregido
             for (int[] palabra : decodificacioHamming.getPalabraDeCodigos()) {
@@ -197,71 +198,62 @@ public class ControladorPalabra {
             int menos = 0;
             for (int palabra[] : decodificacioHamming.getPalabraDeDatos()) {
                 count = 1;
-                for (int bi : palabra) {
-                    if (bi == 0 && count % 9 != 0) {
-                        count++;
+                int i = 0;
+                while (i < palabra.length) {
+                    if (palabra[i] == 0) {
                         esImpar++;
                     }
+                    if (esImpar % 8 == 0 && esImpar != 0) {
+                        menos = 1;
+                        break;
+                    }
+                    if ((i + 1) % 8 == 0) {
+                        esImpar = 0;
+                    }
+                    i++;
                 }
-                if (esImpar != 8) {
-                    esImpar = 0;
-                } else {
-                    menos = 1;
-                }
-                count = 1;
                 catidadDePalabras++;
             }
-            //String[] ascii = new String[9];
 
             String[] ascii;
             if (menos == 1) {
-                ascii = new String[catidadDePalabras * 2 - 2];
-            } else {
                 ascii = new String[catidadDePalabras * 2 - 1];
+            } else {
+                ascii = new String[catidadDePalabras * 2];
             }
-            System.out.println("length: " + ascii.length);
-            for(int palabra[] : decodificacioHamming.getPalabraDeDatos()){
-                for(int bi : palabra){
-                    System.out.print(bi);
-                }
-                System.out.println("");
-            }
-            
             count = 0;
             int count2 = 0;
             // Se construye un vector de String de los caracteres originales
             for (int palabra[] : decodificacioHamming.getPalabraDeDatos()) {
                 int exponente = 7;
                 int codigoAscii = 0;
-                String p = "";
                 for (int bi : palabra) {
-                    p = p + String.valueOf(bi);
                     codigoAscii = codigoAscii + (bi * (int) (Math.pow(2, exponente)));
                     exponente--;
                     if (count2 == 7) {
-                        if(codigoAscii != 0){
+                        if (codigoAscii != 0) {
                             ascii[count] = String.valueOf((char) codigoAscii);
+                            count++;
+                        }
                         codigoAscii = 0;
                         exponente = 7;
-                        count++;
                         count2 = -1;
-                        }    
                     }
                     count2++;
-                }                
+                }
             }
-            
+
             for (int i = 0; i < ascii.length - 1; i++) {
                 String aux = ascii[i];
-                if(ascii[i + 1] != null && (i + 1) % 2 != 0){
+                if (ascii[i + 1] != null && (i + 1) % 2 != 0) {
                     ascii[i] = ascii[i + 1];
                     ascii[i + 1] = aux;
                 }
             }
-            
+
             // Guarda los caracteres en el .txt
             decodificacioHamming.crearDecodificacionHamming(ascii);
-            
+
             return true;
 
         } catch (Exception e) {

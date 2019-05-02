@@ -283,7 +283,6 @@ public class Palabra {
             if (binario[m - exponente] == 1) {
                 if (count == 0) {
                     b = this.palabrasDeCodigo[fila][n - k + 1];
-
                 } else {
                     if (this.palabrasDeCodigo[fila][n - k + 1] == b) {
                         b = 0;

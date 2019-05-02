@@ -23,18 +23,20 @@ public class Correccion {
         String ruta2 = "src/Modelo/cod.ham";
         ControladorPalabra controlador = new ControladorPalabra();
 
-        /*
         if (controlador.envio(ruta)) {
 
         } else {
             System.out.println("No se pudo enviar");
         }
-        */
+                /*
+
         if (controlador.recepcion(ruta2)) {
 
         } else {
-            System.out.println("No se pudo enviar");
+            System.out.println("No se pudo recibir");
         }
+        */
+
     }
 
 }
